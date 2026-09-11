@@ -13,6 +13,8 @@ credentials/
 # Profiles, output, logs, backups, and databases
 browser-profile/
 browser-profiles/
+profile/
+profiles/
 playwright-output/
 downloads/
 logs/

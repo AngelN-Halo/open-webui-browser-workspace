@@ -17,7 +17,7 @@ services:
       - "127.0.0.1:6080:6080"
     volumes:
       - visible-browser-profile:/home/browser/profile
-    networks: [browser, webui]
+    networks: [browser]
   visible-playwright:
     image: mcr.microsoft.com/playwright/mcp:latest
     restart: unless-stopped
