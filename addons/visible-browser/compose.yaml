@@ -1,0 +1,67 @@
+name: open-webui-visible-browser
+services:
+  visible-browser-session:
+    build:
+      context: ./browser
+    image: open-webui/visible-browser:chromium
+    restart: unless-stopped
+    init: true
+    shm_size: 1gb
+    mem_limit: 2g
+    pids_limit: 512
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    environment:
+      DISPLAY: ":99"
+    ports:
+      - "127.0.0.1:6080:6080"
+    volumes:
+      - visible-browser-profile:/home/browser/profile
+    networks: [browser, webui]
+  visible-playwright:
+    image: mcr.microsoft.com/playwright/mcp:latest
+    restart: unless-stopped
+    init: true
+    depends_on: [visible-browser-session]
+    entrypoint: ["node", "/app/cli.js"]
+    command:
+      - --cdp-endpoint
+      - http://127.0.0.1:9222
+      - --port
+      - "8931"
+      - --host
+      - "0.0.0.0"
+      - --allowed-hosts
+      - "visible-browser-session:8931,visible-playwright:8931,localhost:8931,127.0.0.1:8931"
+      - --shared-browser-context
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    network_mode: service:visible-browser-session
+  visible-browser-tools:
+    image: ghcr.io/open-webui/mcpo:main
+    restart: unless-stopped
+    init: true
+    depends_on: [visible-playwright]
+    command:
+      - --host
+      - "0.0.0.0"
+      - --port
+      - "8000"
+      - --api-key
+      - "${BROWSER_TOOLS_API_KEY:?Run ./setup.sh first}"
+      - --strict-auth
+      - --server-type
+      - streamable-http
+      - --
+      - http://visible-browser-session:8931/mcp
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    networks: [browser, webui]
+volumes:
+  visible-browser-profile:
+    name: ${VISIBLE_BROWSER_PROFILE_VOLUME:-open-webui_visible-browser-profile}
+networks:
+  browser: {}
+  webui:
+    external: true
+    name: ${OPEN_WEBUI_NETWORK:-open-webui_default}
