@@ -44,11 +44,10 @@ installation instructions before running `setup.sh`.
 
 ## 1. Get the repository
 
-Copy this repository's HTTPS or SSH clone URL from your Git hosting service.
-Replace `REPOSITORY_CLONE_URL` below with that URL; it is a placeholder.
+Clone the public repository on your Docker host:
 
 ```bash
-git clone REPOSITORY_CLONE_URL open-webui-browser-workspace
+git clone https://github.com/AngelN-Halo/open-webui-browser-workspace.git open-webui-browser-workspace
 cd open-webui-browser-workspace
 ```
 
